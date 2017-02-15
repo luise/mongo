@@ -40,6 +40,10 @@ func main() {
 		return
 	}
 
+	if err := pingWait(peers); err != nil {
+		log.Fatalf("Error ping wait: %s", err)
+	}
+
 	// At this point, mongod may or may not have gotten to the point where it can
 	// receive instructions to configure the replica set.  Thus, we have to wait
 	// until its ready by sleeping.
@@ -70,4 +74,32 @@ func setupReplicaSet(host string, peers []string) error {
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	return cmd.Run()
+}
+
+// pingWait blocks until all `addrs` are pingable.
+func pingWait(addrs []string) error {
+	var err error
+	for _, fullAddr := range addrs {
+		addr := strings.Split(fullAddr, ":")[0]
+		log.Printf("Pinging %s", addr)
+		for pinged := false; !pinged; pinged, err = ping(addr) {
+			if err != nil {
+				return err
+			}
+			time.Sleep(time.Second)
+		}
+		log.Printf("Successfully pinged %s", addr)
+	}
+	return nil
+}
+
+func ping(addr string) (bool, error) {
+	err := exec.Command("ping", "-c1", addr).Run()
+	if err != nil {
+		if _, ok := err.(*exec.ExitError); ok {
+			return false, nil
+		}
+		return false, err
+	}
+	return true, nil
 }
