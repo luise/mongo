@@ -9,25 +9,13 @@ import (
 	"time"
 )
 
-const initialRole = "initial"
-const subsequentRole = "subsequent"
-
 func main() {
-	host := os.Getenv("HOST")
-	if host == "" {
-		log.Fatal("You must specify a `HOST`")
+	memEnv := os.Getenv("MEMBERS")
+	if memEnv == "" {
+		log.Fatal("Must specify a set of members")
 	}
 
-	role := os.Getenv("ROLE")
-	if role == "" {
-		log.Fatal("You must specify a `ROLE`")
-	} else if role != initialRole && role != subsequentRole {
-		log.Fatal("`ROLE` must be 'initial' or 'subsequent'")
-	}
-	log.Printf("Preparing %s", role)
-
-	peersVar := os.Getenv("PEERS")
-	peers := strings.Split(peersVar, ",")
+	members := strings.Split(memEnv, ",")
 
 	log.Printf("Starting Mongo server")
 	cmd := exec.Command("mongod", "--replSet", "rs0")
@@ -36,11 +24,11 @@ func main() {
 	cmd.Start()
 	defer cmd.Wait()
 
-	if role != initialRole || len(peers) == 0 {
+	if initiate := os.Getenv("INITIATOR"); initiate != "true" {
 		return
 	}
 
-	if err := pingWait(peers); err != nil {
+	if err := pingWait(members); err != nil {
 		log.Fatalf("Error ping wait: %s", err)
 	}
 
@@ -48,13 +36,13 @@ func main() {
 	// receive instructions to configure the replica set.  Thus, we have to wait
 	// until its ready by sleeping.
 	time.Sleep(5 * time.Second)
-	log.Printf("Setting up replica set with peers: %+v", peers)
-	if err := setupReplicaSet(host, peers); err != nil {
+	log.Printf("Setting up replica set with members: %+v", members)
+	if err := setupReplicaSet(members); err != nil {
 		log.Printf("Failed setup replica set: %s", err)
 	}
 }
 
-func setupReplicaSet(host string, peers []string) error {
+func setupReplicaSet(members []string) error {
 	rsInit := `
 		rs.initiate(
 			{
@@ -64,12 +52,12 @@ func setupReplicaSet(host string, peers []string) error {
 			}
 		)`
 
-	var members []string
-	for i, m := range append([]string{host}, peers...) {
-		members = append(members, fmt.Sprintf(`{_id: %d, host : "%s"}`, i, m))
+	var memObjs []string
+	for i, m := range members {
+		memObjs = append(memObjs, fmt.Sprintf(`{_id: %d, host : "%s"}`, i, m))
 	}
 
-	rsInit = fmt.Sprintf(rsInit, strings.Join(members, ","))
+	rsInit = fmt.Sprintf(rsInit, strings.Join(memObjs, ","))
 	cmd := exec.Command("mongo", "--eval", rsInit)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
