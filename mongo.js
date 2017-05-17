@@ -1,3 +1,4 @@
+const {Container, Service} = require("@quilt/quilt");
 var image = "quilt/mongo";
 
 function Mongo(nWorker) {

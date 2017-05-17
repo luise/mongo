@@ -1,4 +1,5 @@
-var Mongo = require("github.com/quilt/mongo");
+const {createDeployment, Machine, Range, githubKeys} = require("@quilt/quilt");
+var Mongo = require("./mongo.js");
 var nWorker = 3;
 
 var deployment = createDeployment({});
