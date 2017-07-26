@@ -13,7 +13,7 @@ function Mongo(nWorker) {
   // The initiator is choosen completley arbitrarily.
   members[0].setEnv("INITIATOR", "true");
 
-  this._members.connect(this.port, this._members);
+  this._members.allowFrom(this.port, this._members);
 };
 
 Mongo.prototype.port = 27017;
@@ -29,7 +29,7 @@ Mongo.prototype.services = function() {
 Mongo.prototype.connect = function(p, to) {
   var services = to.services();
   for (i = 0; i < services.length; i++) {
-    this._members.connect(p, services[i]);
+    services[i].allowFrom(this._members, p);
   }
 };
 
