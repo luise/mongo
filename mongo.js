@@ -13,7 +13,7 @@ function Mongo(nWorker) {
   // The initiator is choosen completley arbitrarily.
   members[0].setEnv("INITIATOR", "true");
 
-  this._members.allowFrom(this.port, this._members);
+  this._members.allowFrom(this._members, this.port);
 };
 
 Mongo.prototype.port = 27017;
