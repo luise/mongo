@@ -1,40 +1,41 @@
-const {Container, Service} = require("@quilt/quilt");
-var image = "quilt/mongo";
+const { Container, Service } = require('@quilt/quilt');
+
+const image = 'quilt/mongo';
 
 function Mongo(nWorker) {
-  var members = new Container(image).replicate(nWorker);
-  this._members = new Service("mongo", members);
+  const members = new Container(image).replicate(nWorker);
+  this.members = new Service('mongo', members);
 
-  var children = this._members.children().join(",");
-  members.forEach(function(m) {
-    m.setEnv("MEMBERS", children);
-  })
+  const children = this.members.children().join(',');
+  members.forEach((m) => {
+    m.setEnv('MEMBERS', children);
+  });
 
   // The initiator is choosen completley arbitrarily.
-  members[0].setEnv("INITIATOR", "true");
+  members[0].setEnv('INITIATOR', 'true');
 
-  this._members.allowFrom(this._members, this.port);
-};
+  this.members.allowFrom(this.members, this.port);
+}
 
 Mongo.prototype.port = 27017;
 
-Mongo.prototype.deploy = function(deployment) {
+Mongo.prototype.deploy = function deploy(deployment) {
   deployment.deploy(this.services());
 };
 
-Mongo.prototype.services = function() {
-  return [this._members];
+Mongo.prototype.services = function services() {
+  return [this.members];
 };
 
-Mongo.prototype.connect = function(p, to) {
-  var services = to.services();
-  for (i = 0; i < services.length; i++) {
-    services[i].allowFrom(this._members, p);
-  }
+Mongo.prototype.connect = function connect(p, to) {
+  const services = to.services();
+  services.forEach((serv) => {
+    serv.allowFrom(this.members, p);
+  });
 };
 
-Mongo.prototype.uri = function(dbName) {
-  return "mongodb://" + this._members.children().join(",") + "/" + dbName;
+Mongo.prototype.uri = function uri(dbName) {
+  return `mongodb://${this.members.children().join(',')}/${dbName}`;
 };
 
 module.exports = Mongo;

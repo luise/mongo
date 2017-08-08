@@ -1,16 +1,17 @@
-const {createDeployment, Machine, Range, githubKeys} = require("@quilt/quilt");
-var Mongo = require("./mongo.js");
-var nWorker = 3;
+const { createDeployment, Machine, Range, githubKeys } = require('@quilt/quilt');
+const Mongo = require('./mongo.js');
 
-var deployment = createDeployment({});
+const nWorker = 3;
 
-var baseMachine = new Machine({
-    provider: "Amazon",
-    cpu: new Range(2),
-    ram: new Range(2),
-    sshKeys: githubKeys("ejj"),
+const deployment = createDeployment({});
+
+const baseMachine = new Machine({
+  provider: 'Amazon',
+  cpu: new Range(2),
+  ram: new Range(2),
+  sshKeys: githubKeys('ejj'),
 });
-var mongo = new Mongo(nWorker);
+const mongo = new Mongo(nWorker);
 
 deployment.deploy(baseMachine.asMaster());
 deployment.deploy(baseMachine.asWorker().replicate(nWorker));
