@@ -27,10 +27,10 @@ Mongo.prototype.services = function services() {
   return [this.members];
 };
 
-Mongo.prototype.connect = function connect(p, to) {
-  const services = to.services();
+Mongo.prototype.allowFrom = function allowFrom(from, p) {
+  const services = from.services();
   services.forEach((serv) => {
-    serv.allowFrom(this.members, p);
+    this.members.allowFrom(serv, p);
   });
 };
 

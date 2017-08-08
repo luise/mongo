@@ -1,6 +1,6 @@
 {
   "name": "@quilt/mongo",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "main": "./mongo.js",
   "license": "MIT",
   "dependencies": {
