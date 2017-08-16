@@ -1,41 +1,37 @@
-const { Container, Service } = require('@quilt/quilt');
+const { Container, allow } = require('@quilt/quilt');
 
 const image = 'quilt/mongo';
 
-function Mongo(nWorker) {
-  const members = new Container(image).replicate(nWorker);
-  this.members = new Service('mongo', members);
+function getHostname(c) {
+  return c.getHostname();
+}
 
-  const children = this.members.children().join(',');
-  members.forEach((m) => {
-    m.setEnv('MEMBERS', children);
+function Mongo(nWorker) {
+  this.cluster = new Container('mongo', image).replicate(nWorker);
+
+  const hostnames = this.cluster.map(getHostname).join(',');
+  this.cluster.forEach((m) => {
+    m.setEnv('MEMBERS', hostnames);
   });
 
   // The initiator is choosen completley arbitrarily.
-  members[0].setEnv('INITIATOR', 'true');
+  this.cluster[0].setEnv('INITIATOR', 'true');
 
-  this.members.allowFrom(this.members, this.port);
+  allow(this.cluster, this.cluster, this.port);
 }
 
 Mongo.prototype.port = 27017;
 
 Mongo.prototype.deploy = function deploy(deployment) {
-  deployment.deploy(this.services());
-};
-
-Mongo.prototype.services = function services() {
-  return [this.members];
+  deployment.deploy(this.cluster);
 };
 
 Mongo.prototype.allowFrom = function allowFrom(from, p) {
-  const services = from.services();
-  services.forEach((serv) => {
-    this.members.allowFrom(serv, p);
-  });
+  allow(from, this.cluster, p);
 };
 
 Mongo.prototype.uri = function uri(dbName) {
-  return `mongodb://${this.members.children().join(',')}/${dbName}`;
+  return `mongodb://${this.cluster.map(getHostname).join(',')}/${dbName}`;
 };
 
 module.exports = Mongo;
