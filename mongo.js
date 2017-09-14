@@ -7,7 +7,10 @@ function getHostname(c) {
 }
 
 function Mongo(nWorker) {
-  this.cluster = new Container('mongo', image).replicate(nWorker);
+  this.cluster = [];
+  for (let i = 0; i < nWorker; i += 1) {
+    this.cluster.push(new Container('mongo', image));
+  }
 
   const hostnames = this.cluster.map(getHostname).join(',');
   this.cluster.forEach((m) => {
