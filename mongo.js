@@ -26,7 +26,7 @@ function Mongo(nWorker) {
 Mongo.prototype.port = 27017;
 
 Mongo.prototype.deploy = function deploy(deployment) {
-  deployment.deploy(this.cluster);
+  this.cluster.forEach(container => container.deploy(deployment));
 };
 
 Mongo.prototype.allowFrom = function allowFrom(from, p) {

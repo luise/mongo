@@ -7,5 +7,5 @@ This repository implements a MongoDB specification for Quilt.js.  See
 var Mongo = require("github.com/quilt/mongo");
 
 var deployment = createDeployment({});
-deployment.deploy(new Mongo(3));
+(new Mongo(3)).deploy(deployment);
 ```

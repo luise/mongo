@@ -15,4 +15,4 @@ const mongo = new Mongo(nWorker);
 
 deployment.deploy(baseMachine.asMaster());
 deployment.deploy(baseMachine.asWorker().replicate(nWorker));
-deployment.deploy(mongo);
+mongo.deploy(deployment);
