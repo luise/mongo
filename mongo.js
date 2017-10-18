@@ -1,6 +1,6 @@
-const { Container, allow } = require('@quilt/quilt');
+const { Container, allow } = require('kelda');
 
-const image = 'quilt/mongo';
+const image = 'keldaio/mongo';
 
 function getHostname(c) {
   return c.getHostname();

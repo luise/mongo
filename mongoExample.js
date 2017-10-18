@@ -1,4 +1,4 @@
-const { createDeployment, Machine, Range, githubKeys } = require('@quilt/quilt');
+const { createDeployment, Machine, Range, githubKeys } = require('kelda');
 const Mongo = require('./mongo.js');
 
 const nWorker = 3;

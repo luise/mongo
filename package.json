@@ -1,10 +1,10 @@
 {
-  "name": "@quilt/mongo",
+  "name": "@kelda/mongo",
   "version": "0.0.2",
   "main": "./mongo.js",
   "license": "MIT",
   "dependencies": {
-    "@quilt/quilt": "quilt/quilt"
+    "kelda": "0.x"
   },
   "devDependencies": {
     "eslint": "^4.4.1",
