@@ -1,9 +1,7 @@
-const { createDeployment, Machine, Range, githubKeys } = require('kelda');
+const { Infrastructure, Machine, Range, githubKeys } = require('kelda');
 const Mongo = require('./mongo.js');
 
 const nWorker = 3;
-
-const deployment = createDeployment({});
 
 const baseMachine = new Machine({
   provider: 'Amazon',
@@ -11,8 +9,8 @@ const baseMachine = new Machine({
   ram: new Range(2),
   sshKeys: githubKeys('ejj'),
 });
+
 const mongo = new Mongo(nWorker);
 
-deployment.deploy(baseMachine.asMaster());
-deployment.deploy(baseMachine.asWorker().replicate(nWorker));
-mongo.deploy(deployment);
+const infra = new Infrastructure(baseMachine, baseMachine.replicate(nWorker));
+mongo.deploy(infra);
