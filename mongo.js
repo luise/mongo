@@ -1,4 +1,4 @@
-const { Container, allow } = require('kelda');
+const { Container, allowTraffic } = require('kelda');
 
 const image = 'keldaio/mongo';
 
@@ -20,7 +20,7 @@ function Mongo(nWorker) {
   // The initiator is choosen completley arbitrarily.
   this.containers[0].setEnv('INITIATOR', 'true');
 
-  allow(this.containers, this.containers, this.port);
+  allowTraffic(this.containers, this.containers, this.port);
 }
 
 Mongo.prototype.port = 27017;
@@ -29,8 +29,8 @@ Mongo.prototype.deploy = function deploy(deployment) {
   this.containers.forEach(container => container.deploy(deployment));
 };
 
-Mongo.prototype.allowFrom = function allowFrom(from, p) {
-  allow(from, this.containers, p);
+Mongo.prototype.allowTrafficFrom = function allowTrafficFrom(from, p) {
+  allowTraffic(from, this.containers, p);
 };
 
 Mongo.prototype.uri = function uri(dbName) {
