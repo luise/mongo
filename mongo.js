@@ -14,11 +14,11 @@ function Mongo(nWorker) {
 
   const hostnames = this.containers.map(getHostname).join(',');
   this.containers.forEach((m) => {
-    m.setEnv('MEMBERS', hostnames);
+    m.env.MEMBERS = hostnames; // eslint-disable-line no-param-reassign
   });
 
   // The initiator is choosen completley arbitrarily.
-  this.containers[0].setEnv('INITIATOR', 'true');
+  this.containers[0].env.INITIATOR = 'true';
 
   allowTraffic(this.containers, this.containers, this.port);
 }
