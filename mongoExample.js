@@ -11,5 +11,8 @@ const baseMachine = new Machine({
 
 const mongo = new Mongo(nWorker);
 
-const infra = new Infrastructure(baseMachine, baseMachine.replicate(nWorker));
+const infra = new Infrastructure({
+  masters: baseMachine,
+  workers: baseMachine.replicate(nWorker),
+});
 mongo.deploy(infra);

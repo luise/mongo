@@ -9,7 +9,7 @@ function getHostname(c) {
 function Mongo(nWorker) {
   this.containers = [];
   for (let i = 0; i < nWorker; i += 1) {
-    this.containers.push(new Container('mongo', image));
+    this.containers.push(new Container({ name: 'mongo', image }));
   }
 
   const hostnames = this.containers.map(getHostname).join(',');
